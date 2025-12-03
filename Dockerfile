@@ -1,7 +1,16 @@
-FROM node:20-alpine3.19
+FROM node:20 AS builder
 WORKDIR /app
-COPY package.json ./
-RUN npm install 
+
+COPY package*.json ./
+RUN npm install --production
+
 COPY . .
-EXPOSE 5000
-CMD ["npm", "run", "start"]
+
+FROM node:20-slim
+WORKDIR /app
+
+COPY --from=builder /app .
+
+EXPOSE 3000
+
+CMD ["npm", "start"]
